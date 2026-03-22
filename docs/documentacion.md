@@ -52,7 +52,7 @@ Desarrollar una aplicación que permita:
 * Registro de servicios
 * Edición de servicios
 
-## 🗄 Base de Datos
+## Base de Datos
 
 El sistema utiliza PostgreSQL como sistema de gestión de base de datos.
 
