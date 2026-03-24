@@ -1,99 +1,79 @@
-# Sistema de Reservas para Servicios Profesionales
+Sistema de Reservas para Servicios Profesionales
 
-## Descripción del Proyecto
+1. Descripción General
 
-El Sistema de Reservas para Servicios Profesionales es una aplicación web que permite a los usuarios registrarse, iniciar sesión y gestionar reservas de servicios ofrecidos por profesionales.
+El Sistema de Reservas para Servicios Profesionales es una aplicación web orientada a la gestión de servicios ofrecidos por profesionales, permitiendo a los usuarios registrarse, iniciar sesión y agendar citas de manera eficiente.
 
-El sistema también permite a los administradores gestionar los servicios disponibles, asegurando una correcta organización y disponibilidad de los mismos.
+El sistema contempla dos roles principales: usuario y administrador, cada uno con funcionalidades específicas.
 
-## Objetivo
+2. Análisis de Requerimientos
+   
+2.1 Requerimientos Funcionales
+El sistema debe permitir el registro de usuarios.
+El sistema debe permitir el inicio de sesión.
+El usuario debe poder visualizar servicios disponibles.
+El usuario debe poder consultar horarios de profesionales.
+El usuario debe poder realizar reservas.
+El usuario debe poder cancelar reservas.
+El administrador debe poder registrar servicios.
+El administrador debe poder editar servicios.
 
-Desarrollar una aplicación que permita:
+2.2 Requerimientos No Funcionales
+El sistema debe ser accesible vía web.
+El sistema debe garantizar la seguridad de autenticación.
+El sistema debe ser escalable.
+El sistema debe responder en tiempos adecuados.
 
-* Gestionar usuarios y autenticación
-* Administrar servicios y profesionales
-* Permitir la reserva de citas
-* Controlar la disponibilidad de horarios
+3. Diseño del Sistema
 
-## Tecnologías Utilizadas
+3.1 Arquitectura
+El sistema está basado en una arquitectura cliente-servidor:
+Frontend: Angular (interfaz de usuario)
+Backend: Node.js con Express (lógica del sistema)
+Base de datos: PostgreSQL
 
-* **Backend:** Node.js con Express
-* **Frontend:** Angular
-* **Base de datos:** PostgreSQL
-* **Control de versiones:** GitHub
-* **Gestión del proyecto:** Jira (Scrum)
-* **Despliegue:** Docker y Render
-* 
-## Estructura del Proyecto
+3.2 Modelo de Datos (Descripción)
+El sistema está compuesto por las siguientes entidades principales:
+Usuarios
+Servicios
+Profesionales
+Horarios
+Reservas
 
-### Backend (reservas-backend)
+Relaciones:
+Un usuario puede tener múltiples reservas.
+Un profesional puede ofrecer múltiples servicios.
+Un profesional tiene múltiples horarios.
+Una reserva está asociada a un usuario, servicio y profesional.
 
-* `app.js` → servidor principal
-* `database/schema.sql` → estructura de la base de datos
-* `docs/documentacion.md` → documentación del sistema
+4. Tecnologías Utilizadas
+Backend: Node.js con Express
+Frontend: Angular
+Base de datos: PostgreSQL
+Control de versiones: GitHub
+Gestión del proyecto: Jira (Scrum)
+Despliegue: Docker y Render
 
-### Frontend (reservas-frontend)
+5. Estructura del Proyecto
+Backend (reservas-backend)
+app.js → servidor principal
+database/schema.sql → estructura de la base de datos
+docs/documentacion.md → documentación
+Frontend (reservas-frontend)
+Aplicación Angular (en desarrollo)
 
-* Aplicación Angular (en desarrollo)
+6. Metodología de Desarrollo
+El proyecto se desarrolla bajo la metodología ágil Scrum, utilizando Jira para la gestión del Product Backlog, épicas e historias de usuario.
 
-## Funcionalidades del Sistema
+7. Estado Actual del Proyecto
+Actualmente el proyecto se encuentra en fase inicial:
 
-### Usuario
+Definición del proyecto en Jira
+Creación de épicas
+Creación de historias de usuario
+Organización del backlog
+Creación de repositorios
+Diseño inicial de la base de datos
 
-* Registro de cuenta
-* Inicio de sesión
-* Visualización de servicios disponibles
-* Visualización de horarios de profesionales
-* Reserva de servicios
-* Cancelación de reservas
-
-### Administrador
-
-* Registro de servicios
-* Edición de servicios
-
-## Base de Datos
-
-El sistema utiliza PostgreSQL como sistema de gestión de base de datos.
-
-### Tablas principales:
-
-* **usuarios:** almacena la información de los usuarios del sistema
-* **servicios:** contiene los servicios disponibles
-* **profesionales:** almacena los profesionales que ofrecen servicios
-* **horarios:** gestiona la disponibilidad de los profesionales
-* **reservas:** registra las reservas realizadas por los usuarios
-
-### Relaciones:
-
-* Un usuario puede realizar múltiples reservas
-* Un servicio puede estar asociado a un profesional
-* Un profesional tiene múltiples horarios disponibles
-* Una reserva está asociada a un usuario, servicio y profesional
-
-## Metodología de Trabajo
-
-El proyecto se desarrolla utilizando la metodología ágil **Scrum**, gestionada mediante Jira.
-
-Se han definido:
-
-* Épicas del sistema
-* Historias de usuario
-* Product Backlog
-
-## Estado Actual del Proyecto
-
-Actualmente el proyecto se encuentra en fase inicial, donde se ha realizado:
-
-* Definición del proyecto en Jira
-* Creación de épicas
-* Creación de historias de usuario
-* Organización del backlog
-* Creación de repositorios en GitHub
-* Definición de la estructura inicial del sistema
-* Diseño inicial de la base de datos
-
-## Observaciones
-
-Este proyecto será desarrollado progresivamente mediante sprints, donde se implementarán las funcionalidades definidas en el backlog.
-
+8. Observaciones
+El sistema será desarrollado de forma incremental mediante sprints, implementando progresivamente las funcionalidades definidas.
