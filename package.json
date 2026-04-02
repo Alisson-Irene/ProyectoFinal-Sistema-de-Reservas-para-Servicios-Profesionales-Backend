@@ -1,0 +1,35 @@
+{
+  "name": "proyectofinal-sistema-de-reservas-para-servicios-profesionales-backend",
+  "version": "1.0.0",
+  "description": "CONEXIÓN AL FRONTEND \r https://github.com/Alisson-Irene/ProyectoFinal-Sistema-de-Reservas-para-Servicios-Profesionales-Frontend.git",
+  "main": "app.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alisson-Irene/ProyectoFinal-Sistema-de-Reservas-para-Servicios-Profesionales-Backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Alisson-Irene/ProyectoFinal-Sistema-de-Reservas-para-Servicios-Profesionales-Backend/issues"
+  },
+  "homepage": "https://github.com/Alisson-Irene/ProyectoFinal-Sistema-de-Reservas-para-Servicios-Profesionales-Backend#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.20.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
