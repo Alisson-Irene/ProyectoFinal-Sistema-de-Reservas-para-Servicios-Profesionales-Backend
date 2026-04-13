@@ -7,7 +7,7 @@ const obtenerUsuarios = async (req, res) => {
     );
     res.json(result.rows);
   } catch (error) {
-    console.error(error);
+    console.error('ERROR AL OBTENER USUARIOS:', error);
     res.status(500).json({ mensaje: 'Error al obtener usuarios' });
   }
 };
@@ -15,6 +15,8 @@ const obtenerUsuarios = async (req, res) => {
 const crearUsuario = async (req, res) => {
   try {
     const { nombre, correo, password, rol } = req.body;
+
+    console.log('DATOS RECIBIDOS EN REGISTER:', req.body);
 
     if (!nombre || !correo || !password) {
       return res.status(400).json({ mensaje: 'Todos los campos son obligatorios' });
@@ -34,12 +36,14 @@ const crearUsuario = async (req, res) => {
       [nombre, correo, password, rol || 'usuario']
     );
 
+    console.log('USUARIO INSERTADO:', result.rows[0]);
+
     res.status(201).json({
       mensaje: 'Usuario registrado correctamente',
       usuario: result.rows[0]
     });
   } catch (error) {
-    console.error(error);
+    console.error('ERROR AL REGISTRAR USUARIO:', error);
     res.status(500).json({ mensaje: 'Error al registrar usuario' });
   }
 };
@@ -56,7 +60,7 @@ const actualizarUsuario = async (req, res) => {
 
     res.json({ mensaje: 'Usuario actualizado correctamente' });
   } catch (error) {
-    console.error(error);
+    console.error('ERROR AL ACTUALIZAR USUARIO:', error);
     res.status(500).json({ mensaje: 'Error al actualizar usuario' });
   }
 };
@@ -69,7 +73,7 @@ const eliminarUsuario = async (req, res) => {
 
     res.json({ mensaje: 'Usuario eliminado correctamente' });
   } catch (error) {
-    console.error(error);
+    console.error('ERROR AL ELIMINAR USUARIO:', error);
     res.status(500).json({ mensaje: 'Error al eliminar usuario' });
   }
 };
