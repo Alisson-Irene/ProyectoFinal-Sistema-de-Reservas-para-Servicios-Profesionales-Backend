@@ -78,9 +78,45 @@ const eliminarUsuario = async (req, res) => {
   }
 };
 
+const cambiarPassword = async (req, res) => {
+  try {
+    const { correo, actual, nueva } = req.body;
+
+    if (!correo || !actual || !nueva) {
+      return res.status(400).json({ message: 'Completa todos los campos' });
+    }
+
+    const result = await pool.query(
+      'SELECT * FROM usuarios WHERE correo = $1',
+      [correo]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    const usuario = result.rows[0];
+
+    if (usuario.password !== actual) {
+      return res.status(400).json({ message: 'Contraseña actual incorrecta' });
+    }
+
+    await pool.query(
+      'UPDATE usuarios SET password = $1 WHERE correo = $2',
+      [nueva, correo]
+    );
+
+    res.json({ message: 'Contraseña actualizada correctamente' });
+  } catch (error) {
+    console.error('ERROR AL CAMBIAR CONTRASEÑA:', error);
+    res.status(500).json({ message: 'Error al cambiar contraseña' });
+  }
+};
+
 module.exports = {
   obtenerUsuarios,
   crearUsuario,
   actualizarUsuario,
-  eliminarUsuario
+  eliminarUsuario,
+  cambiarPassword
 };

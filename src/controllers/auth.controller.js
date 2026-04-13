@@ -2,56 +2,30 @@ const pool = require('../config/db');
 
 const login = async (req, res) => {
   try {
-    // 🔹 Recibir datos
     const { correo, password } = req.body;
 
-    console.log("BODY:", req.body);
-
-    // 🔹 Validar que vengan datos
     if (!correo || !password) {
-      return res.status(400).json({ 
-        mensaje: 'Correo y contraseña son obligatorios' 
-      });
+      return res.status(400).json({ mensaje: 'Correo y contraseña son obligatorios' });
     }
 
-    // 🔹 Limpiar espacios (MUY IMPORTANTE)
-    const correoLimpio = correo.trim();
-    const passwordLimpia = password.trim();
-
-    // 🔹 Buscar usuario en la BD
     const result = await pool.query(
-      'SELECT * FROM usuarios WHERE correo = $1 AND password = $2',
-      [correoLimpio, passwordLimpia]
+      'SELECT id, nombre, correo, rol FROM usuarios WHERE correo = $1 AND password = $2',
+      [correo, password]
     );
 
-    console.log("RESULTADO BD:", result.rows);
-
-    // 🔹 Validar si existe
     if (result.rows.length === 0) {
-      return res.status(401).json({ 
-        mensaje: 'Credenciales incorrectas' 
-      });
+      return res.status(401).json({ mensaje: 'Credenciales incorrectas' });
     }
 
-    // 🔹 Usuario encontrado
     const usuario = result.rows[0];
 
-    // 🔹 Respuesta correcta
     res.json({
       mensaje: 'Inicio de sesión correcto',
-      usuario: {
-        id: usuario.id,
-        nombre: usuario.nombre,
-        correo: usuario.correo,
-        rol: usuario.rol
-      }
+      usuario
     });
-
   } catch (error) {
     console.error('ERROR LOGIN:', error);
-    res.status(500).json({ 
-      mensaje: 'Error en el servidor' 
-    });
+    res.status(500).json({ mensaje: 'Error en el servidor' });
   }
 };
 

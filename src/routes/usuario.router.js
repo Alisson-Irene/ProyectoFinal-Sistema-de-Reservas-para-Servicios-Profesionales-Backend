@@ -5,11 +5,13 @@ const {
   obtenerUsuarios,
   crearUsuario,
   actualizarUsuario,
-  eliminarUsuario
+  eliminarUsuario,
+  cambiarPassword
 } = require('../controllers/usuario.controller');
 
 router.get('/', obtenerUsuarios);
 router.post('/', crearUsuario);
+router.put('/cambiar-password', cambiarPassword); // 🔥 AQUÍ
 router.put('/:id', actualizarUsuario);
 router.delete('/:id', eliminarUsuario);
 
