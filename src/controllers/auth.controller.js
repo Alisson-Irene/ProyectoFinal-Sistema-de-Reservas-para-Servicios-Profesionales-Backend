@@ -1,64 +1,58 @@
-const db = require('../config/db');
+const pool = require('../config/db');
 
-// REGISTRAR USUARIO
-const register = async (req, res) => {
-    try {
-        const { nombre, correo, password, rol } = req.body;
-
-        const result = await db.query(
-            'INSERT INTO usuarios (nombre, correo, password, rol) VALUES ($1, $2, $3, $4) RETURNING *',
-            [nombre, correo, password, rol || 'usuario']
-        );
-
-        res.status(201).json({
-            message: 'Usuario registrado correctamente',
-            user: result.rows[0]
-        });
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error al registrar usuario' });
-    }
-};
-
-// LOGIN
 const login = async (req, res) => {
-    try {
-        const { correo, password } = req.body;
+  try {
+    // 🔹 Recibir datos
+    const { correo, password } = req.body;
 
-        const result = await db.query(
-            'SELECT * FROM usuarios WHERE correo = $1',
-            [correo]
-        );
+    console.log("BODY:", req.body);
 
-        if (result.rows.length === 0) {
-            return res.status(404).json({
-                message: 'Usuario no encontrado'
-            });
-        }
-
-        const user = result.rows[0];
-
-        if (user.password !== password) {
-            return res.status(401).json({
-                message: 'Contraseña incorrecta'
-            });
-        }
-
-        res.status(200).json({
-            message: 'Login exitoso',
-            user
-        });
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            message: 'Error al iniciar sesión'
-        });
+    // 🔹 Validar que vengan datos
+    if (!correo || !password) {
+      return res.status(400).json({ 
+        mensaje: 'Correo y contraseña son obligatorios' 
+      });
     }
+
+    // 🔹 Limpiar espacios (MUY IMPORTANTE)
+    const correoLimpio = correo.trim();
+    const passwordLimpia = password.trim();
+
+    // 🔹 Buscar usuario en la BD
+    const result = await pool.query(
+      'SELECT * FROM usuarios WHERE correo = $1 AND password = $2',
+      [correoLimpio, passwordLimpia]
+    );
+
+    console.log("RESULTADO BD:", result.rows);
+
+    // 🔹 Validar si existe
+    if (result.rows.length === 0) {
+      return res.status(401).json({ 
+        mensaje: 'Credenciales incorrectas' 
+      });
+    }
+
+    // 🔹 Usuario encontrado
+    const usuario = result.rows[0];
+
+    // 🔹 Respuesta correcta
+    res.json({
+      mensaje: 'Inicio de sesión correcto',
+      usuario: {
+        id: usuario.id,
+        nombre: usuario.nombre,
+        correo: usuario.correo,
+        rol: usuario.rol
+      }
+    });
+
+  } catch (error) {
+    console.error('ERROR LOGIN:', error);
+    res.status(500).json({ 
+      mensaje: 'Error en el servidor' 
+    });
+  }
 };
 
-module.exports = {
-    register,
-    login
-};
+module.exports = { login };
