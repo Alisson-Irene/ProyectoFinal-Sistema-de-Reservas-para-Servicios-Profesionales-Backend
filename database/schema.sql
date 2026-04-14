@@ -37,3 +37,6 @@ CREATE TABLE reservas (
     hora TIME,
     estado VARCHAR(20) DEFAULT 'ACTIVA'
 );
+
+INSERT INTO usuarios (nombre, correo, password, rol)
+VALUES ('Admin', 'admin@gmail.com', '1234', 'admin');
