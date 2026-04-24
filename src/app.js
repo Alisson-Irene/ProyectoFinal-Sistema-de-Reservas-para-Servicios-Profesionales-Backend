@@ -1,35 +1,112 @@
 const express = require('express');
-const authRoutes = require('./routes/auth.routes');
-const db = require('./config/db');
 const cors = require('cors');
+const db = require('./config/db');
 
+const authRoutes = require('./routes/auth.routes');
 const profesionalRoutes = require('./routes/profesional_routes');
 const horarioRoutes = require('./routes/horario_routes');
 const reservaRoutes = require('./routes/reserva_routes');
 const servicioRoutes = require('./routes/servicio_routes');
-const usuarioRoutes = require('./routes/usuario.router'); // 
+const usuarioRoutes = require('./routes/usuario.router');
+const categoriaRoutes = require('./routes/categoria_routes');
 
-const app = express(); 
+
+const app = express();
 const PORT = 3000;
 
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
+// RUTAS EXISTENTES
 app.use('/api/auth', authRoutes);
 app.use('/api/profesionales', profesionalRoutes);
 app.use('/api/horarios', horarioRoutes);
 app.use('/api/reservas', reservaRoutes);
 app.use('/api/servicios', servicioRoutes);
-app.use('/api/usuarios', usuarioRoutes); //
+app.use('/api/usuarios', usuarioRoutes);
+
+app.use('/api/categorias', categoriaRoutes);
+
+
+// PRUEBA DE CONEXIÓN
+app.get('/api/db-test', async (req, res) => {
+  try {
+    const dbName = await db.query('SELECT current_database() AS database');
+    const schemaName = await db.query('SHOW search_path');
+    const tablas = await db.query(`
+      SELECT table_schema, table_name
+      FROM information_schema.tables
+      WHERE table_name IN ('categorias', 'estados_reserva', 'pagos')
+      ORDER BY table_name
+    `);
+
+    res.json({
+      database: dbName.rows[0].database,
+      search_path: schemaName.rows[0].search_path,
+      tablas: tablas.rows
+    });
+  } catch (error) {
+    console.error('ERROR DB TEST:', error);
+    res.status(500).json({ message: 'Error al probar conexión' });
+  }
+});
+
+// CATEGORÍAS
+app.get('/api/categorias', async (req, res) => {
+  try {
+    const result = await db.query(
+      'SELECT id, nombre FROM public.categorias ORDER BY id ASC'
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error('ERROR CATEGORIAS:', error);
+    res.status(500).json({
+      message: 'Error al obtener categorías',
+      detalle: error.message
+    });
+  }
+});
+
+// ESTADOS DE RESERVA
+app.get('/api/estados', async (req, res) => {
+  try {
+    const result = await db.query(
+      'SELECT id, nombre FROM public.estados_reserva ORDER BY id ASC'
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error('ERROR ESTADOS:', error);
+    res.status(500).json({
+      message: 'Error al obtener estados',
+      detalle: error.message
+    });
+  }
+});
+
+// PAGOS
+app.get('/api/pagos', async (req, res) => {
+  try {
+    const result = await db.query(
+      'SELECT id, reserva_id, monto, fecha_pago FROM public.pagos ORDER BY id ASC'
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error('ERROR PAGOS:', error);
+    res.status(500).json({
+      message: 'Error al obtener pagos',
+      detalle: error.message
+    });
+  }
+});
 
 app.get('/', (req, res) => {
-    res.send('Servidor funcionando correctamente');
+  res.send('Servidor funcionando correctamente');
 });
 
 db.connect()
-    .then(() => console.log('Base de datos conectada'))
-    .catch(err => console.error('Error de conexión', err));
+  .then(() => console.log('Base de datos conectada'))
+  .catch(err => console.error('Error de conexión', err));
 
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
