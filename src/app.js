@@ -10,29 +10,27 @@ const servicioRoutes = require('./routes/servicio_routes');
 const usuarioRoutes = require('./routes/usuario.router');
 const categoriaRoutes = require('./routes/categoria_routes');
 
-
 const app = express();
 const PORT = 3000;
 
 app.use(cors());
 app.use(express.json());
 
-// RUTAS EXISTENTES
+// RUTAS
 app.use('/api/auth', authRoutes);
 app.use('/api/profesionales', profesionalRoutes);
 app.use('/api/horarios', horarioRoutes);
 app.use('/api/reservas', reservaRoutes);
 app.use('/api/servicios', servicioRoutes);
 app.use('/api/usuarios', usuarioRoutes);
-
 app.use('/api/categorias', categoriaRoutes);
-
 
 // PRUEBA DE CONEXIÓN
 app.get('/api/db-test', async (req, res) => {
   try {
     const dbName = await db.query('SELECT current_database() AS database');
     const schemaName = await db.query('SHOW search_path');
+
     const tablas = await db.query(`
       SELECT table_schema, table_name
       FROM information_schema.tables
@@ -47,22 +45,9 @@ app.get('/api/db-test', async (req, res) => {
     });
   } catch (error) {
     console.error('ERROR DB TEST:', error);
-    res.status(500).json({ message: 'Error al probar conexión' });
-  }
-});
-
-// CATEGORÍAS
-app.get('/api/categorias', async (req, res) => {
-  try {
-    const result = await db.query(
-      'SELECT id, nombre FROM public.categorias ORDER BY id ASC'
-    );
-    res.json(result.rows);
-  } catch (error) {
-    console.error('ERROR CATEGORIAS:', error);
-    res.status(500).json({
-      message: 'Error al obtener categorías',
-      detalle: error.message
+    res.status(500).json({ 
+      message: 'Error al probar conexión',
+      detalle: error.message 
     });
   }
 });

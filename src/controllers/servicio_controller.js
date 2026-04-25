@@ -20,7 +20,10 @@ const obtenerServicios = async (req, res) => {
     res.json(result.rows);
   } catch (error) {
     console.error('ERROR AL OBTENER SERVICIOS:', error);
-    res.status(500).json({ message: 'Error al obtener servicios' });
+    res.status(500).json({
+      message: 'Error al obtener servicios',
+      detalle: error.message
+    });
   }
 };
 
@@ -45,7 +48,10 @@ const obtenerServiciosActivos = async (req, res) => {
     res.json(result.rows);
   } catch (error) {
     console.error('ERROR SERVICIOS ACTIVOS:', error);
-    res.status(500).json({ message: 'Error al obtener servicios activos' });
+    res.status(500).json({
+      message: 'Error al obtener servicios activos',
+      detalle: error.message
+    });
   }
 };
 
@@ -54,26 +60,34 @@ const crearServicio = async (req, res) => {
   try {
     const { nombre, descripcion, precio, categoria_id, estado } = req.body;
 
-    if (!nombre || !descripcion || precio === null || precio === undefined || !categoria_id) {
-      return res.status(400).json({ message: 'Todos los campos son obligatorios' });
+    if (!nombre || !descripcion || precio === null || precio === undefined || precio === '') {
+      return res.status(400).json({
+        message: 'Nombre, descripción y precio son obligatorios'
+      });
     }
 
+    const categoriaFinal = categoria_id ? Number(categoria_id) : null;
     const estadoFinal = estado || 'ACTIVO';
 
     const result = await pool.query(
       `INSERT INTO servicios 
-      (nombre, descripcion, precio, categoria_id, estado) 
-      VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [nombre, descripcion, precio, categoria_id, estadoFinal]
+       (nombre, descripcion, precio, categoria_id, estado)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING *`,
+      [nombre, descripcion, precio, categoriaFinal, estadoFinal]
     );
 
     res.status(201).json({
       message: 'Servicio creado correctamente',
       servicio: result.rows[0]
     });
+
   } catch (error) {
     console.error('ERROR AL CREAR SERVICIO:', error);
-    res.status(500).json({ message: 'Error al crear servicio' });
+    res.status(500).json({
+      message: 'Error al crear servicio',
+      detalle: error.message
+    });
   }
 };
 
@@ -83,29 +97,44 @@ const actualizarServicio = async (req, res) => {
     const { id } = req.params;
     const { nombre, descripcion, precio, categoria_id, estado } = req.body;
 
-    if (!nombre || !descripcion || precio === null || precio === undefined || !categoria_id || !estado) {
-      return res.status(400).json({ message: 'Todos los campos son obligatorios' });
+    if (!nombre || !descripcion || precio === null || precio === undefined || precio === '') {
+      return res.status(400).json({
+        message: 'Nombre, descripción y precio son obligatorios'
+      });
     }
+
+    const categoriaFinal = categoria_id ? Number(categoria_id) : null;
+    const estadoFinal = estado || 'ACTIVO';
 
     const result = await pool.query(
       `UPDATE servicios 
-       SET nombre = $1, descripcion = $2, precio = $3, categoria_id = $4, estado = $5
-       WHERE id = $6 
+       SET nombre = $1,
+           descripcion = $2,
+           precio = $3,
+           categoria_id = $4,
+           estado = $5
+       WHERE id = $6
        RETURNING *`,
-      [nombre, descripcion, precio, categoria_id, estado, id]
+      [nombre, descripcion, precio, categoriaFinal, estadoFinal, id]
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ message: 'Servicio no encontrado' });
+      return res.status(404).json({
+        message: 'Servicio no encontrado'
+      });
     }
 
     res.json({
       message: 'Servicio actualizado correctamente',
       servicio: result.rows[0]
     });
+
   } catch (error) {
     console.error('ERROR AL ACTUALIZAR SERVICIO:', error);
-    res.status(500).json({ message: 'Error al actualizar servicio' });
+    res.status(500).json({
+      message: 'Error al actualizar servicio',
+      detalle: error.message
+    });
   }
 };
 
@@ -120,13 +149,21 @@ const eliminarServicio = async (req, res) => {
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ message: 'Servicio no encontrado' });
+      return res.status(404).json({
+        message: 'Servicio no encontrado'
+      });
     }
 
-    res.json({ message: 'Servicio eliminado correctamente' });
+    res.json({
+      message: 'Servicio eliminado correctamente'
+    });
+
   } catch (error) {
     console.error('ERROR AL ELIMINAR SERVICIO:', error);
-    res.status(500).json({ message: 'Error al eliminar servicio' });
+    res.status(500).json({
+      message: 'Error al eliminar servicio',
+      detalle: error.message
+    });
   }
 };
 
