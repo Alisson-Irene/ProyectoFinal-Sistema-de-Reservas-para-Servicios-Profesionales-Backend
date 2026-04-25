@@ -11,6 +11,21 @@ const crearReserva = async (req, res) => {
       });
     }
 
+    // Validar que ese profesional no tenga otra reserva en la misma fecha y hora
+    const existeReserva = await db.query(
+      `SELECT id FROM reservas
+       WHERE profesional_id = $1
+       AND fecha = $2
+       AND hora = $3`,
+      [profesional_id, fecha, hora]
+    );
+
+    if (existeReserva.rows.length > 0) {
+      return res.status(400).json({
+        message: 'Ese profesional ya tiene una reserva en esa fecha y hora'
+      });
+    }
+
     const result = await db.query(
       `INSERT INTO reservas 
        (usuario_id, servicio_id, profesional_id, fecha, hora, estado)
