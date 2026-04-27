@@ -9,6 +9,7 @@ const reservaRoutes = require('./routes/reserva_routes');
 const servicioRoutes = require('./routes/servicio_routes');
 const usuarioRoutes = require('./routes/usuario.router');
 const categoriaRoutes = require('./routes/categoria_routes');
+const formaPagoRoutes = require('./routes/forma_pago_routes');
 
 const app = express();
 const PORT = 3000;
@@ -24,6 +25,7 @@ app.use('/api/reservas', reservaRoutes);
 app.use('/api/servicios', servicioRoutes);
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/categorias', categoriaRoutes);
+app.use('/api/formas-pago', formaPagoRoutes);
 
 // PRUEBA DE CONEXIÓN
 app.get('/api/db-test', async (req, res) => {
@@ -34,7 +36,7 @@ app.get('/api/db-test', async (req, res) => {
     const tablas = await db.query(`
       SELECT table_schema, table_name
       FROM information_schema.tables
-      WHERE table_name IN ('categorias', 'estados_reserva', 'pagos')
+      WHERE table_name IN ('categorias', 'estados_reserva', 'formas_pago', 'pagos')
       ORDER BY table_name
     `);
 

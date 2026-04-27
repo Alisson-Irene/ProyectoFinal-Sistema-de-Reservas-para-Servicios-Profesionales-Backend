@@ -10,7 +10,8 @@ CREATE TABLE servicios (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     descripcion TEXT,
-    precio DECIMAL(10,2) NOT NULL
+    precio DECIMAL(10,2) NOT NULL,
+    imagen_url TEXT
 );
 
 CREATE TABLE profesionales (
@@ -18,6 +19,13 @@ CREATE TABLE profesionales (
     nombre VARCHAR(100) NOT NULL,
     especialidad VARCHAR(100),
     telefono VARCHAR(20)
+);
+
+CREATE TABLE formas_pago (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL UNIQUE,
+    descripcion TEXT,
+    estado VARCHAR(20) NOT NULL DEFAULT 'ACTIVO'
 );
 
 CREATE TABLE horarios (
@@ -33,6 +41,7 @@ CREATE TABLE reservas (
     usuario_id INT REFERENCES usuarios(id),
     servicio_id INT REFERENCES servicios(id),
     profesional_id INT REFERENCES profesionales(id),
+    forma_pago_id INT REFERENCES formas_pago(id),
     fecha DATE,
     hora TIME,
     estado VARCHAR(20) DEFAULT 'ACTIVA'
@@ -40,3 +49,9 @@ CREATE TABLE reservas (
 
 INSERT INTO usuarios (nombre, correo, password, rol)
 VALUES ('Admin', 'admin@gmail.com', '1234', 'admin');
+
+INSERT INTO formas_pago (nombre, descripcion, estado)
+VALUES
+    ('Efectivo', 'Pago presencial en efectivo', 'ACTIVO'),
+    ('Tarjeta', 'Pago con tarjeta de debito o credito', 'ACTIVO'),
+    ('Transferencia', 'Pago por transferencia bancaria', 'ACTIVO');

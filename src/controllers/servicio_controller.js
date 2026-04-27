@@ -10,6 +10,7 @@ const obtenerServicios = async (req, res) => {
         s.descripcion,
         s.precio,
         s.estado,
+        s.imagen_url,
         s.categoria_id,
         c.nombre AS categoria
       FROM servicios s
@@ -37,6 +38,7 @@ const obtenerServiciosActivos = async (req, res) => {
         s.descripcion,
         s.precio,
         s.estado,
+        s.imagen_url,
         s.categoria_id,
         c.nombre AS categoria
       FROM servicios s
@@ -58,7 +60,7 @@ const obtenerServiciosActivos = async (req, res) => {
 // CREAR SERVICIO
 const crearServicio = async (req, res) => {
   try {
-    const { nombre, descripcion, precio, categoria_id, estado } = req.body;
+    const { nombre, descripcion, precio, categoria_id, estado, imagen_url } = req.body;
 
     if (!nombre || !descripcion || precio === null || precio === undefined || precio === '') {
       return res.status(400).json({
@@ -71,10 +73,10 @@ const crearServicio = async (req, res) => {
 
     const result = await pool.query(
       `INSERT INTO servicios 
-       (nombre, descripcion, precio, categoria_id, estado)
-       VALUES ($1, $2, $3, $4, $5)
+       (nombre, descripcion, precio, categoria_id, estado, imagen_url)
+       VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [nombre, descripcion, precio, categoriaFinal, estadoFinal]
+      [nombre, descripcion, precio, categoriaFinal, estadoFinal, imagen_url || null]
     );
 
     res.status(201).json({
@@ -95,7 +97,7 @@ const crearServicio = async (req, res) => {
 const actualizarServicio = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, descripcion, precio, categoria_id, estado } = req.body;
+    const { nombre, descripcion, precio, categoria_id, estado, imagen_url } = req.body;
 
     if (!nombre || !descripcion || precio === null || precio === undefined || precio === '') {
       return res.status(400).json({
@@ -112,10 +114,11 @@ const actualizarServicio = async (req, res) => {
            descripcion = $2,
            precio = $3,
            categoria_id = $4,
-           estado = $5
-       WHERE id = $6
+           estado = $5,
+           imagen_url = $6
+       WHERE id = $7
        RETURNING *`,
-      [nombre, descripcion, precio, categoriaFinal, estadoFinal, id]
+      [nombre, descripcion, precio, categoriaFinal, estadoFinal, imagen_url || null, id]
     );
 
     if (result.rows.length === 0) {

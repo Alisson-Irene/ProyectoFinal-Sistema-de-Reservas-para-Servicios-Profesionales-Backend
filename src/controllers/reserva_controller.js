@@ -3,9 +3,9 @@ const db = require('../config/db');
 // CREAR RESERVA
 const crearReserva = async (req, res) => {
   try {
-    const { usuario_id, servicio_id, profesional_id, fecha, hora } = req.body;
+    const { usuario_id, servicio_id, profesional_id, forma_pago_id, fecha, hora } = req.body;
 
-    if (!usuario_id || !servicio_id || !profesional_id || !fecha || !hora) {
+    if (!usuario_id || !servicio_id || !profesional_id || !forma_pago_id || !fecha || !hora) {
       return res.status(400).json({
         message: 'Todos los campos son obligatorios'
       });
@@ -28,10 +28,10 @@ const crearReserva = async (req, res) => {
 
     const result = await db.query(
       `INSERT INTO reservas 
-       (usuario_id, servicio_id, profesional_id, fecha, hora, estado)
-       VALUES ($1, $2, $3, $4, $5, 'PENDIENTE')
+       (usuario_id, servicio_id, profesional_id, forma_pago_id, fecha, hora, estado)
+       VALUES ($1, $2, $3, $4, $5, $6, 'PENDIENTE')
        RETURNING *`,
-      [usuario_id, servicio_id, profesional_id, fecha, hora]
+      [usuario_id, servicio_id, profesional_id, forma_pago_id, fecha, hora]
     );
 
     res.status(201).json({
@@ -61,6 +61,8 @@ const listarReservas = async (req, res) => {
         s.precio,
         r.profesional_id,
         COALESCE(p.nombre, 'Profesional no encontrado') AS profesional,
+        r.forma_pago_id,
+        COALESCE(fp.nombre, 'Forma de pago no encontrada') AS forma_pago,
         r.fecha,
         r.hora,
         r.estado
@@ -68,6 +70,7 @@ const listarReservas = async (req, res) => {
       LEFT JOIN usuarios u ON r.usuario_id = u.id
       LEFT JOIN servicios s ON r.servicio_id = s.id
       LEFT JOIN profesionales p ON r.profesional_id = p.id
+      LEFT JOIN formas_pago fp ON r.forma_pago_id = fp.id
       ORDER BY r.id DESC
     `);
 
