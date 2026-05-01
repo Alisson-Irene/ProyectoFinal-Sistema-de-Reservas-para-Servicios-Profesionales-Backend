@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { verificarToken, autorizarRoles } = require('../middlewares/auth.middleware');
 
 const {
   obtenerUsuarios,
@@ -9,9 +10,12 @@ const {
   cambiarPassword
 } = require('../controllers/usuario.controller');
 
+router.put('/cambiar-password', cambiarPassword); // 🔥 AQUÍ
+
+router.use(verificarToken, autorizarRoles('admin'));
+
 router.get('/', obtenerUsuarios);
 router.post('/', crearUsuario);
-router.put('/cambiar-password', cambiarPassword); // 🔥 AQUÍ
 router.put('/:id', actualizarUsuario);
 router.delete('/:id', eliminarUsuario);
 

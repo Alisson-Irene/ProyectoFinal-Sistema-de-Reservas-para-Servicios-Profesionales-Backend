@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { verificarToken, autorizarRoles } = require('../middlewares/auth.middleware');
 
 const {
   obtenerServicios,
@@ -9,10 +10,10 @@ const {
   eliminarServicio
 } = require('../controllers/servicio_controller');
 
-router.get('/', obtenerServicios);
-router.get('/activos', obtenerServiciosActivos);
-router.post('/', crearServicio);
-router.put('/:id', actualizarServicio);
-router.delete('/:id', eliminarServicio);
+router.get('/activos', verificarToken, autorizarRoles('admin', 'usuario'), obtenerServiciosActivos);
+router.get('/', verificarToken, autorizarRoles('admin'), obtenerServicios);
+router.post('/', verificarToken, autorizarRoles('admin'), crearServicio);
+router.put('/:id', verificarToken, autorizarRoles('admin'), actualizarServicio);
+router.delete('/:id', verificarToken, autorizarRoles('admin'), eliminarServicio);
 
 module.exports = router;

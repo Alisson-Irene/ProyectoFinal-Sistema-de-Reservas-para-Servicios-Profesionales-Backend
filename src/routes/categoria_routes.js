@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { verificarToken, autorizarRoles } = require('../middlewares/auth.middleware');
 
 const {
   obtenerCategorias,
@@ -9,11 +10,11 @@ const {
 } = require('../controllers/categoria_controller');
 
 // 🔹 USUARIO (solo ver)
-router.get('/', obtenerCategorias);
+router.get('/', verificarToken, autorizarRoles('admin', 'usuario'), obtenerCategorias);
 
 // 🔹 ADMIN (CRUD completo)
-router.post('/', crearCategoria);        // crear
-router.put('/:id', actualizarCategoria); // editar
-router.delete('/:id', eliminarCategoria); // eliminar
+router.post('/', verificarToken, autorizarRoles('admin'), crearCategoria);        // crear
+router.put('/:id', verificarToken, autorizarRoles('admin'), actualizarCategoria); // editar
+router.delete('/:id', verificarToken, autorizarRoles('admin'), eliminarCategoria); // eliminar
 
 module.exports = router;

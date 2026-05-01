@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const db = require('./config/db');
@@ -10,6 +12,7 @@ const servicioRoutes = require('./routes/servicio_routes');
 const usuarioRoutes = require('./routes/usuario.router');
 const categoriaRoutes = require('./routes/categoria_routes');
 const formaPagoRoutes = require('./routes/forma_pago_routes');
+const { verificarToken, autorizarRoles } = require('./middlewares/auth.middleware');
 
 const app = express();
 const PORT = 3000;
@@ -55,7 +58,7 @@ app.get('/api/db-test', async (req, res) => {
 });
 
 // ESTADOS DE RESERVA
-app.get('/api/estados', async (req, res) => {
+app.get('/api/estados', verificarToken, autorizarRoles('admin'), async (req, res) => {
   try {
     const result = await db.query(
       'SELECT id, nombre FROM public.estados_reserva ORDER BY id ASC'
@@ -71,7 +74,7 @@ app.get('/api/estados', async (req, res) => {
 });
 
 // PAGOS
-app.get('/api/pagos', async (req, res) => {
+app.get('/api/pagos', verificarToken, autorizarRoles('admin'), async (req, res) => {
   try {
     const result = await db.query(
       'SELECT id, reserva_id, monto, fecha_pago FROM public.pagos ORDER BY id ASC'

@@ -1,12 +1,15 @@
 const express = require('express');
 const router = express.Router();
+const { verificarToken, autorizarRoles } = require('../middlewares/auth.middleware');
 
 const {
   crearReserva,
-  listarReservas
+  listarReservas,
+  actualizarEstadoReserva
 } = require('../controllers/reserva_controller');
 
-router.post('/', crearReserva);
-router.get('/', listarReservas);
+router.get('/', verificarToken, autorizarRoles('admin', 'usuario'), listarReservas);
+router.post('/', verificarToken, autorizarRoles('admin', 'usuario'), crearReserva);
+router.put('/:id/estado', verificarToken, autorizarRoles('admin'), actualizarEstadoReserva);
 
 module.exports = router;

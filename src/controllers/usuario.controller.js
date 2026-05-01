@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { compararPassword, hashPassword } = require('../utils/password');
 
 const obtenerUsuarios = async (req, res) => {
   try {
@@ -31,9 +32,11 @@ const crearUsuario = async (req, res) => {
       return res.status(400).json({ mensaje: 'El correo ya está registrado' });
     }
 
+    const passwordHasheada = await hashPassword(password);
+
     const result = await pool.query(
       'INSERT INTO usuarios (nombre, correo, password, rol) VALUES ($1, $2, $3, $4) RETURNING id, nombre, correo, rol',
-      [nombre, correo, password, rol || 'usuario']
+      [nombre, correo, passwordHasheada, rol || 'usuario']
     );
 
     console.log('USUARIO INSERTADO:', result.rows[0]);
@@ -53,10 +56,18 @@ const actualizarUsuario = async (req, res) => {
     const { id } = req.params;
     const { nombre, correo, password, rol } = req.body;
 
-    await pool.query(
-      'UPDATE usuarios SET nombre = $1, correo = $2, password = $3, rol = $4 WHERE id = $5',
-      [nombre, correo, password, rol, id]
-    );
+    if (password) {
+      const passwordHasheada = await hashPassword(password);
+      await pool.query(
+        'UPDATE usuarios SET nombre = $1, correo = $2, password = $3, rol = $4 WHERE id = $5',
+        [nombre, correo, passwordHasheada, rol, id]
+      );
+    } else {
+      await pool.query(
+        'UPDATE usuarios SET nombre = $1, correo = $2, rol = $3 WHERE id = $4',
+        [nombre, correo, rol, id]
+      );
+    }
 
     res.json({ mensaje: 'Usuario actualizado correctamente' });
   } catch (error) {
@@ -97,13 +108,17 @@ const cambiarPassword = async (req, res) => {
 
     const usuario = result.rows[0];
 
-    if (usuario.password !== actual) {
+    const passwordValida = await compararPassword(actual, usuario.password);
+
+    if (!passwordValida) {
       return res.status(400).json({ message: 'Contraseña actual incorrecta' });
     }
 
+    const nuevaHasheada = await hashPassword(nueva);
+
     await pool.query(
       'UPDATE usuarios SET password = $1 WHERE correo = $2',
-      [nueva, correo]
+      [nuevaHasheada, correo]
     );
 
     res.json({ message: 'Contraseña actualizada correctamente' });

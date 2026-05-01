@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { verificarToken, autorizarRoles } = require('../middlewares/auth.middleware');
 
 const {
     crearProfesional,
@@ -8,9 +9,9 @@ const {
     eliminarProfesional
 } = require('../controllers/profesional_controller');
 
-router.post('/', crearProfesional);
-router.get('/', listarProfesionales);
-router.put('/:id', actualizarProfesional);
-router.delete('/:id', eliminarProfesional);
+router.get('/', verificarToken, autorizarRoles('admin', 'usuario'), listarProfesionales);
+router.post('/', verificarToken, autorizarRoles('admin'), crearProfesional);
+router.put('/:id', verificarToken, autorizarRoles('admin'), actualizarProfesional);
+router.delete('/:id', verificarToken, autorizarRoles('admin'), eliminarProfesional);
 
 module.exports = router;

@@ -11,6 +11,12 @@ const crearReserva = async (req, res) => {
       });
     }
 
+    if (req.usuario.rol === 'usuario' && Number(usuario_id) !== Number(req.usuario.id)) {
+      return res.status(403).json({
+        message: 'No puedes crear reservas para otro usuario'
+      });
+    }
+
     // Validar que ese profesional no tenga otra reserva en la misma fecha y hora
     const existeReserva = await db.query(
       `SELECT id FROM reservas
@@ -51,6 +57,14 @@ const crearReserva = async (req, res) => {
 // LISTAR RESERVAS
 const listarReservas = async (req, res) => {
   try {
+    const valores = [];
+    let filtroUsuario = '';
+
+    if (req.usuario.rol === 'usuario') {
+      valores.push(req.usuario.id);
+      filtroUsuario = 'WHERE r.usuario_id = $1';
+    }
+
     const result = await db.query(`
       SELECT 
         r.id,
@@ -71,8 +85,9 @@ const listarReservas = async (req, res) => {
       LEFT JOIN servicios s ON r.servicio_id = s.id
       LEFT JOIN profesionales p ON r.profesional_id = p.id
       LEFT JOIN formas_pago fp ON r.forma_pago_id = fp.id
+      ${filtroUsuario}
       ORDER BY r.id DESC
-    `);
+    `, valores);
 
     res.status(200).json(result.rows);
 
@@ -85,7 +100,43 @@ const listarReservas = async (req, res) => {
   }
 };
 
+const actualizarEstadoReserva = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { estado } = req.body;
+
+    if (!estado) {
+      return res.status(400).json({
+        message: 'El estado es obligatorio'
+      });
+    }
+
+    const result = await db.query(
+      'UPDATE reservas SET estado = $1 WHERE id = $2 RETURNING *',
+      [estado, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: 'Reserva no encontrada'
+      });
+    }
+
+    res.json({
+      message: 'Reserva actualizada correctamente',
+      reserva: result.rows[0]
+    });
+  } catch (error) {
+    console.error('ERROR ACTUALIZAR ESTADO RESERVA:', error);
+    res.status(500).json({
+      message: 'Error al actualizar estado de reserva',
+      detalle: error.message
+    });
+  }
+};
+
 module.exports = {
   crearReserva,
-  listarReservas
+  listarReservas,
+  actualizarEstadoReserva
 };
