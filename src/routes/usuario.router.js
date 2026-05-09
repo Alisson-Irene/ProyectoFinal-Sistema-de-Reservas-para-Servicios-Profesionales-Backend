@@ -10,7 +10,7 @@ const {
   cambiarPassword
 } = require('../controllers/usuario.controller');
 
-router.put('/cambiar-password', cambiarPassword); // 🔥 AQUÍ
+router.put('/cambiar-password', cambiarPassword); 
 
 router.use(verificarToken, autorizarRoles('admin'));
 
