@@ -48,7 +48,7 @@ CREATE TABLE reservas (
 );
 
 INSERT INTO usuarios (nombre, correo, password, rol)
-VALUES ('Admin', 'admin@gmail.com', '1234', 'admin');
+VALUES ('Admin', 'admin@gmail.com', '$2b$10$SvevfGDM69dGjMppjTCtV.Afi/0tg831ULJkU8mAg7m5mq7qTxjIW1234', 'admin');
 
 INSERT INTO formas_pago (nombre, descripcion, estado)
 VALUES
