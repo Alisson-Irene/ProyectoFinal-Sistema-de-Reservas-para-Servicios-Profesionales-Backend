@@ -16,9 +16,21 @@ const formaPagoRoutes = require('./routes/forma_pago_routes');
 const { verificarToken, autorizarRoles } = require('./middlewares/auth.middleware');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+const frontendUrls = (process.env.FRONTEND_URL || '')
+  .split(',')
+  .map((url) => url.trim())
+  .filter(Boolean);
 
-app.use(cors());
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || frontendUrls.length === 0 || frontendUrls.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Origen no permitido por CORS'));
+  }
+}));
 app.use(express.json());
 
 // RUTAS
@@ -94,10 +106,10 @@ app.get('/', (req, res) => {
   res.send('Servidor funcionando correctamente');
 });
 
-db.connect()
+db.query('SELECT 1')
   .then(() => console.log('Base de datos conectada'))
   .catch(err => console.error('Error de conexión', err));
 
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`Servidor corriendo en puerto ${PORT}`);
 });
