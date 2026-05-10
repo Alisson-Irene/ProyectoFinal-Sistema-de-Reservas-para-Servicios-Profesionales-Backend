@@ -1,6 +1,5 @@
 require('dotenv').config({ quiet: true });
 
-
 const express = require('express');
 const cors = require('cors');
 const db = require('./config/db');
@@ -17,11 +16,14 @@ const { verificarToken, autorizarRoles } = require('./middlewares/auth.middlewar
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// URLs permitidas del frontend
 const frontendUrls = (process.env.FRONTEND_URL || '')
   .split(',')
   .map((url) => url.trim())
   .filter(Boolean);
 
+// Configuración de CORS
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || frontendUrls.length === 0 || frontendUrls.includes(origin)) {
@@ -29,8 +31,10 @@ app.use(cors({
     }
 
     return callback(new Error('Origen no permitido por CORS'));
-  }
+  },
+  credentials: true
 }));
+
 app.use(express.json());
 
 // RUTAS
@@ -52,20 +56,31 @@ app.get('/api/db-test', async (req, res) => {
     const tablas = await db.query(`
       SELECT table_schema, table_name
       FROM information_schema.tables
-      WHERE table_name IN ('categorias', 'estados_reserva', 'formas_pago', 'pagos')
+      WHERE table_name IN (
+        'usuarios',
+        'categorias',
+        'servicios',
+        'profesionales',
+        'horarios',
+        'reservas',
+        'estados_reserva',
+        'formas_pago',
+        'pagos'
+      )
       ORDER BY table_name
     `);
 
     res.json({
+      message: 'Conexión a base de datos correcta',
       database: dbName.rows[0].database,
       search_path: schemaName.rows[0].search_path,
       tablas: tablas.rows
     });
   } catch (error) {
     console.error('ERROR DB TEST:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Error al probar conexión',
-      detalle: error.message 
+      detalle: error.message
     });
   }
 });
@@ -102,14 +117,17 @@ app.get('/api/pagos', verificarToken, autorizarRoles('admin'), async (req, res) 
   }
 });
 
+// Ruta principal
 app.get('/', (req, res) => {
   res.send('Servidor funcionando correctamente');
 });
 
+// Prueba inicial de conexión a PostgreSQL
 db.query('SELECT 1')
   .then(() => console.log('Base de datos conectada'))
   .catch(err => console.error('Error de conexión', err));
 
-app.listen(PORT, () => {
+// Servidor
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
 });
