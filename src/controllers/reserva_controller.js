@@ -135,8 +135,36 @@ const actualizarEstadoReserva = async (req, res) => {
   }
 };
 
+const eliminarReserva = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await db.query(
+      'DELETE FROM reservas WHERE id = $1 RETURNING *',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: 'Reserva no encontrada'
+      });
+    }
+
+    res.json({
+      message: 'Reserva eliminada correctamente'
+    });
+  } catch (error) {
+    console.error('ERROR ELIMINAR RESERVA:', error);
+    res.status(500).json({
+      message: 'Error al eliminar reserva',
+      detalle: error.message
+    });
+  }
+};
+
 module.exports = {
   crearReserva,
   listarReservas,
-  actualizarEstadoReserva
+  actualizarEstadoReserva,
+  eliminarReserva
 };
